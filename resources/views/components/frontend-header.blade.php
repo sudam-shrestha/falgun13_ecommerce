@@ -10,11 +10,9 @@
         </div>
 
         <nav class="hidden lg:flex items-center gap-8 font-medium text-[var(--text-soft)]">
-            <a href="#" class="hover:text-[var(--primary)] transition">Home</a>
-            <a href="#" class="hover:text-[var(--primary)] transition">Shop</a>
-            <a href="#" class="hover:text-[var(--primary)] transition">Categories</a>
-            <a href="#" class="hover:text-[var(--primary)] transition">Deals</a>
-            <a href="#" class="hover:text-[var(--primary)] transition">Sell on SudamHub</a>
+            <a href="{{route('home')}}" class="hover:text-[var(--primary)] transition">Home</a>
+            <a href="{{route('products')}}" class="hover:text-[var(--primary)] transition">Shop</a>
+            <a href="{{route('deals')}}" class="hover:text-[var(--primary)] transition">Deals</a>
         </nav>
 
         <div class="flex items-center gap-4">

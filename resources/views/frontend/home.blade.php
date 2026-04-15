@@ -45,77 +45,33 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
                 <!-- Card 1 -->
-                <div class="product-card overflow-hidden group">
-                    <div class="h-56 bg-[#e8e1d7] flex items-center justify-center relative">
-                        <i class="fa-solid fa-mug-saucer text-5xl text-primary-40"></i>
-                        <span
-                            class="absolute top-3 left-3 bg-[var(--accent)] text-white text-xs px-3 py-1 rounded-full">-15%</span>
-                        <i
-                            class="fa-regular fa-heart absolute top-3 right-3 text-xl text-primary-60 hover:text-red-400 cursor-pointer"></i>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-lg text-[var(--text-dark)]">Ceramic Pour-Over</h3>
-                            <span class="font-bold text-[var(--primary)]">$38</span>
+                @foreach ($products as $product)
+                    <div class="product-card overflow-hidden group">
+                        <div class="h-56 overflow-hidden bg-[#e8e1d7] flex items-center justify-center relative">
+                            <img src="{{ asset(Storage::url($product->images[0])) }}" alt="{{ $product->name }}">
+                            @if ($product->discount > 0)
+                                <span
+                                    class="absolute top-2 right-0 px-4 bg-red-600 text-white">{{ $product->discount }}%</span>
+                            @endif
                         </div>
-                        <p class="text-sm text-[var(--text-soft)] mt-1">by ClayCraft Dokan</p>
-                        <button
-                            class="btn-cart mt-4 w-full text-[var(--primary)] font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"><i
-                                class="fa-solid fa-cart-plus"></i> Add to cart</button>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="product-card overflow-hidden group">
-                    <div class="h-56 bg-[#dad3c9] flex items-center justify-center relative">
-                        <i class="fa-solid fa-bag-shopping text-5xl text-primary-40"></i>
-                        <i
-                            class="fa-regular fa-heart absolute top-3 right-3 text-xl text-primary-60 hover:text-red-400 cursor-pointer"></i>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-lg text-[var(--text-dark)]">Linen Tote (natural)</h3>
-                            <span class="font-bold text-[var(--primary)]">$26</span>
+                        <div class="p-5">
+                            <h3 class="font-bold text-lg text-[var(--text-dark)]">{{ $product->name }}</h3>
+                            <div class="flex justify-between items-start">
+                                @if ($product->discount > 0)
+                                    <span>
+                                        <del class="text-[red]">Rs.{{ $product->price }}</del>
+                                    </span>
+                                @endif
+                                <span
+                                    class="font-bold text-[var(--primary)]">Rs.{{ $product->price - ($product->discount * $product->price) / 100 }}</span>
+                            </div>
+                            <p class="text-sm text-[var(--text-soft)] mt-1">by {{ $product->dokan->name }}</p>
+                            <a href="{{route('product', $product->slug)}}"
+                                class="btn-cart mt-4 w-full text-[var(--primary)] font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"><i
+                                    class="fa-solid fa-cart-plus"></i> View product</a>
                         </div>
-                        <p class="text-sm text-[var(--text-soft)] mt-1">Weave & Wonder</p>
-                        <button
-                            class="btn-cart mt-4 w-full text-[var(--primary)] font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"><i
-                                class="fa-solid fa-cart-plus"></i> Add to cart</button>
                     </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="product-card overflow-hidden group">
-                    <div class="h-56 bg-[#e0d5c4] flex items-center justify-center relative">
-                        <i class="fa-solid fa-fire text-5xl text-primary-40"></i>
-                        <span
-                            class="absolute top-3 left-3 bg-[var(--primary)] text-white text-xs px-3 py-1 rounded-full">bestseller</span>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-lg text-[var(--text-dark)]">Soy wax candle</h3>
-                            <span class="font-bold text-[var(--primary)]">$22</span>
-                        </div>
-                        <p class="text-sm text-[var(--text-soft)] mt-1">Aroma Dokan</p>
-                        <button
-                            class="btn-cart mt-4 w-full text-[var(--primary)] font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"><i
-                                class="fa-solid fa-cart-plus"></i> Add to cart</button>
-                    </div>
-                </div>
-                <!-- Card 4 -->
-                <div class="product-card overflow-hidden group">
-                    <div class="h-56 bg-[#cfc5b8] flex items-center justify-center relative">
-                        <i class="fa-solid fa-gem text-5xl text-primary-40"></i>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-lg text-[var(--text-dark)]">Brass earrings</h3>
-                            <span class="font-bold text-[var(--primary)]">$45</span>
-                        </div>
-                        <p class="text-sm text-[var(--text-soft)] mt-1">Metal & Stone</p>
-                        <button
-                            class="btn-cart mt-4 w-full text-[var(--primary)] font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"><i
-                                class="fa-solid fa-cart-plus"></i> Add to cart</button>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
