@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\PageController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/clear', [CartController::class, 'clear_cart'])->name('cart.clear');
 
 
-    Route::get('/checkout/{id}', [CartController::class, 'checkout'])->name('checkout.dokan');
+    Route::post('/checkout/{id}', [OrderController::class, 'checkout'])->name('checkout.dokan');
+    Route::get("/khalti/callback", [OrderController::class, "callback"])->name("khalti.callback");
+    Route::get("/order/history", [OrderController::class, "history"])->name("order.history");
 
+    Route::get('/payment/retry/{id}', [OrderController::class, 'payment_retry'])->name('payment.retry');
+    Route::get('/order/details/{id}', [OrderController::class, 'getOrderDetails'])->name('order.details');
 });

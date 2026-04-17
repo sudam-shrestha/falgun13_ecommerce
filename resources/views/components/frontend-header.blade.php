@@ -16,6 +16,8 @@
         </nav>
 
         <div class="flex items-center gap-4">
+            <a href="{{ route('order.history') }}" class="hover:text-[var(--primary)] transition">Orders</a>
+
             <i
                 class="fa-solid fa-magnifying-glass text-xl text-[var(--text-soft)] cursor-pointer hover:text-[var(--primary)]"></i>
 

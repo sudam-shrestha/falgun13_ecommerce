@@ -151,10 +151,13 @@
                                                 Rs.{{ number_format($dokanTotals[$dokanId], 0) }}
                                             </p>
                                         </div>
-                                        <a href="{{ route('checkout.dokan', $dokan->id) }}"
-                                            class="btn-primary px-6 py-2.5">
-                                            <i class="fa-solid fa-lock mr-2"></i> Checkout
-                                        </a>
+                                        <form action="{{ route('checkout.dokan', $dokan->id) }}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="total_amt" value="{{ $dokanTotals[$dokanId] }}">
+                                            <button type="submit" class="btn-primary px-6 py-2.5">
+                                                <i class="fa-solid fa-lock mr-2"></i> Checkout
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -198,10 +201,6 @@
                                         Rs.{{ number_format($grandTotal, 0) }}
                                     </span>
                                 </div>
-
-                                <button class="btn-primary w-full py-3 text-lg" id="checkoutAllBtn">
-                                    <i class="fa-solid fa-lock mr-2"></i> Checkout All
-                                </button>
 
                                 <button class="w-full mt-3 text-sm text-red-600 hover:text-red-700 transition"
                                     id="clearCartBtn">
