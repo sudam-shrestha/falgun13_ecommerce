@@ -4,6 +4,7 @@ use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\PageController;
+use App\Http\Controllers\Frontend\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -41,4 +42,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/payment/retry/{id}', [OrderController::class, 'payment_retry'])->name('payment.retry');
     Route::get('/order/details/{id}', [OrderController::class, 'getOrderDetails'])->name('order.details');
+
+    Route::post('/review/store', [ReviewController::class, 'store'])->name('review.store');
+    Route::get('/review/check/{product_id}', [ReviewController::class, 'check'])->name('review.check');
+    Route::get('/product/reviews/{product_id}', [ReviewController::class, 'getProductReviews'])->name('product.reviews');
+});
+
+
+Route::middleware(['auth:dokan'])->prefix('dokan')->name('dokan.')->group(function () {
+    Route::get('/order/details/{record}', [OrderController::class, 'dokan_order'])->name('order.details');
+    Route::get('/order/receipt/{id}', [OrderController::class, 'downloadDokanReceipt'])->name('receipt.download');
 });

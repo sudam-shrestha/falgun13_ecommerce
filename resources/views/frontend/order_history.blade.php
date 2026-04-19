@@ -15,7 +15,8 @@
             <h1 class="text-3xl md:text-4xl font-bold text-[var(--primary)] mb-2">
                 Order History
             </h1>
-            <p class="text-[var(--text-soft)]">{{ $orders->count() }} {{ Str::plural('order', $orders->count()) }} found</p>
+            <p class="text-[var(--text-soft)]">{{ $orders->count() }} {{ Str::plural('order', $orders->count()) }} found
+            </p>
         </div>
     </section>
 
@@ -31,9 +32,11 @@
                         <div class="bg-white rounded-2xl shadow-sm border border-[var(--border-light)] overflow-hidden">
 
                             <!-- Order Header -->
-                            <div class="bg-[var(--surface)] px-6 py-4 border-b border-[var(--border-light)] flex flex-wrap items-center justify-between gap-4">
+                            <div
+                                class="bg-[var(--surface)] px-6 py-4 border-b border-[var(--border-light)] flex flex-wrap items-center justify-between gap-4">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-[var(--accent-soft-30)] rounded-full flex items-center justify-center">
+                                    <div
+                                        class="w-10 h-10 bg-[var(--accent-soft-30)] rounded-full flex items-center justify-center">
                                         <i class="fa-solid fa-receipt text-[var(--primary)]"></i>
                                     </div>
                                     <div>
@@ -45,18 +48,17 @@
                                 </div>
 
                                 <div class="flex items-center gap-4">
-                                    <!-- Payment Status Badge -->
-                                    <span class="px-3 py-1 rounded-full text-xs font-medium
-                                        @if($order->payment_status == 'Completed') bg-green-100 text-green-700
-                                        @elseif($order->payment_status == 'Pending') bg-yellow-100 text-yellow-700
-                                        @elseif($order->payment_status == 'Failed') bg-red-100 text-red-700
+                                    <span
+                                        class="px-3 py-1 rounded-full text-xs font-medium
+                                        @if ($order->status == 'delivered') bg-green-100 text-green-700
+                                        @elseif($order->status == 'pending') bg-yellow-100 text-yellow-700
                                         @else bg-gray-100 text-gray-700 @endif">
-                                        <i class="fa-regular
-                                            @if($order->payment_status == 'Completed') fa-circle-check
-                                            @elseif($order->payment_status == 'Pending') fa-clock
-                                            @elseif($order->payment_status == 'Failed') fa-circle-exclamation
+                                        <i
+                                            class="fa-regular
+                                            @if ($order->status == 'delivered') fa-circle-check
+                                            @elseif($order->status == 'pending') fa-clock
                                             @else fa-circle @endif mr-1"></i>
-                                        {{ $order->payment_status ?? 'Processing' }}
+                                        {{ $order->status ?? 'Processing' }}
                                     </span>
 
                                     <span class="text-sm text-[var(--text-soft)]">
@@ -81,10 +83,12 @@
                                     <div class="p-6">
                                         <div class="flex gap-4">
                                             <!-- Product Image -->
-                                            <div class="w-24 h-24 flex-shrink-0 bg-[#f5f2ee] rounded-lg overflow-hidden">
-                                                @if($product && $product->images && count($product->images) > 0)
+                                            <div
+                                                class="w-24 h-24 flex-shrink-0 bg-[#f5f2ee] rounded-lg overflow-hidden">
+                                                @if ($product && $product->images && count($product->images) > 0)
                                                     <img src="{{ asset(Storage::url($product->images[0])) }}"
-                                                        alt="{{ $product->name ?? 'Product' }}" class="w-full h-full object-cover">
+                                                        alt="{{ $product->name ?? 'Product' }}"
+                                                        class="w-full h-full object-cover">
                                                 @else
                                                     <div class="w-full h-full flex items-center justify-center">
                                                         <i class="fa-solid fa-image text-gray-400 text-3xl"></i>
@@ -142,14 +146,16 @@
                                     </div>
 
                                     <div class="flex gap-3">
-                                        @if($order->payment_status != 'Completed')
-                                            <a href="{{route('payment.retry', $order->id)}}" class="btn-primary px-6 py-2.5 retry-payment">
+                                        @if ($order->payment_status != 'Completed')
+                                            <a href="{{ route('payment.retry', $order->id) }}"
+                                                class="btn-primary px-6 py-2.5 retry-payment">
                                                 <i class="fa-solid fa-rotate-right mr-2"></i> Retry Payment
                                             </a>
                                         @endif
 
-                                        <button class="border border-[var(--border-light)] px-6 py-2.5 rounded-lg hover:bg-[var(--surface)] transition view-details"
-                                                data-order-id="{{ $order->id }}">
+                                        <button
+                                            class="border border-[var(--border-light)] px-6 py-2.5 rounded-lg hover:bg-[var(--surface)] transition view-details"
+                                            data-order-id="{{ $order->id }}">
                                             <i class="fa-regular fa-eye mr-2"></i> View Details
                                         </button>
                                     </div>
@@ -161,11 +167,13 @@
             @else
                 <!-- Empty Order History -->
                 <div class="text-center py-16">
-                    <div class="w-32 h-32 mx-auto bg-[var(--surface)] rounded-full flex items-center justify-center mb-6">
+                    <div
+                        class="w-32 h-32 mx-auto bg-[var(--surface)] rounded-full flex items-center justify-center mb-6">
                         <i class="fa-regular fa-receipt text-5xl text-[var(--border-light)]"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-[var(--text-dark)] mb-3">No orders yet</h2>
-                    <p class="text-[var(--text-soft)] mb-8">You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                    <p class="text-[var(--text-soft)] mb-8">You haven't placed any orders yet. Start shopping to see
+                        your orders here.</p>
                     <a href="{{ route('products') }}" class="btn-primary inline-flex px-8 py-3">
                         <i class="fa-solid fa-arrow-left mr-2"></i> Start Shopping
                     </a>
@@ -181,7 +189,8 @@
 <div id="orderModal" class="fixed inset-0 z-50 hidden overflow-y-auto" style="background-color: rgba(0,0,0,0.5);">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white border-b border-[var(--border-light)] px-6 py-4 flex justify-between items-center">
+            <div
+                class="sticky top-0 bg-white border-b border-[var(--border-light)] px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-[var(--text-dark)]">Order Details</h3>
                 <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-times text-xl"></i>
@@ -214,7 +223,8 @@
                 const contentDiv = document.getElementById('orderDetailsContent');
 
                 // Show loading state
-                contentDiv.innerHTML = '<div class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-[var(--primary)]"></i><p class="mt-2">Loading order details...</p></div>';
+                contentDiv.innerHTML =
+                    '<div class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-2xl text-[var(--primary)]"></i><p class="mt-2">Loading order details...</p></div>';
                 modal.classList.remove('hidden');
 
                 try {
@@ -224,11 +234,13 @@
                     if (data.success) {
                         displayOrderDetails(data.order);
                     } else {
-                        contentDiv.innerHTML = '<div class="text-center py-8 text-red-600">Failed to load order details</div>';
+                        contentDiv.innerHTML =
+                            '<div class="text-center py-8 text-red-600">Failed to load order details</div>';
                     }
                 } catch (error) {
                     console.error('Failed to load order details:', error);
-                    contentDiv.innerHTML = '<div class="text-center py-8 text-red-600">Failed to load order details</div>';
+                    contentDiv.innerHTML =
+                        '<div class="text-center py-8 text-red-600">Failed to load order details</div>';
                 }
             });
         });

@@ -250,6 +250,279 @@
         </div>
     </div>
 
+    <!-- ========== REVIEWS SECTION ========== -->
+    <section class="section-gap border-t border-[var(--border-light)]">
+        <div class="container">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-[var(--primary)]">
+                    Customer Reviews
+                    @if (isset($reviewsCount) && $reviewsCount > 0)
+                        <span class="text-lg text-[var(--text-soft)] font-normal ml-2">
+                            ({{ $reviewsCount }} {{ Str::plural('review', $reviewsCount) }})
+                        </span>
+                    @endif
+                </h2>
+
+                @if (isset($canReview) && $canReview)
+                    <button onclick="openReviewModal()" class="btn-primary px-6 py-2.5 flex items-center gap-2">
+                        <i class="fa-regular fa-pen-to-square"></i> Write a Review
+                    </button>
+                @endif
+            </div>
+
+            <!-- Rating Summary -->
+            @if (isset($reviewsCount) && $reviewsCount > 0)
+                <div class="bg-[var(--surface)] rounded-2xl p-6 mb-8">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <!-- Average Rating -->
+                        <div class="text-center md:text-left">
+                            <div class="text-5xl font-bold text-[var(--primary)] mb-2">
+                                {{ number_format($averageRating ?? 0, 1) }}
+                            </div>
+                            <div class="flex justify-center md:justify-start gap-1 mb-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= floor($averageRating ?? 0))
+                                        <i class="fa-solid fa-star text-yellow-400"></i>
+                                    @elseif($i == ceil($averageRating ?? 0) && ($averageRating ?? 0) - floor($averageRating ?? 0) >= 0.5)
+                                        <i class="fa-solid fa-star-half-alt text-yellow-400"></i>
+                                    @else
+                                        <i class="fa-regular fa-star text-yellow-400"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="text-sm text-[var(--text-soft)]">
+                                Based on {{ $reviewsCount }} reviews
+                            </p>
+                        </div>
+
+                        <!-- Rating Distribution -->
+                        <div class="flex-1 space-y-2">
+                            @php
+                                $ratingDistribution = [];
+                                for ($i = 5; $i >= 1; $i--) {
+                                    $count = $product->reviews->where('rating', $i)->count();
+                                    $percentage = $reviewsCount > 0 ? ($count / $reviewsCount) * 100 : 0;
+                                    $ratingDistribution[$i] = ['count' => $count, 'percentage' => $percentage];
+                                }
+                            @endphp
+
+                            @foreach ($ratingDistribution as $rating => $data)
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm font-medium w-12">{{ $rating }} stars</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-yellow-400 rounded-full"
+                                            style="width: {{ $data['percentage'] }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-[var(--text-soft)] w-12">{{ $data['count'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Reviews List -->
+            <div id="reviewsList" class="space-y-6">
+                @if (isset($product->reviews) && $product->reviews->count() > 0)
+                    @foreach ($product->reviews as $review)
+                        <div class="bg-white rounded-2xl p-6 border border-[var(--border-light)]">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div
+                                            class="w-10 h-10 bg-[var(--accent-soft-30)] rounded-full flex items-center justify-center">
+                                            <i class="fa-regular fa-user text-[var(--primary)]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-[var(--text-dark)]">
+                                                {{ $review->user->name }}
+                                            </p>
+                                            <p class="text-xs text-[var(--text-soft)]">
+                                                {{ $review->created_at->format('F j, Y') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i
+                                                class="fa-{{ $i <= $review->rating ? 'solid' : 'regular' }} fa-star text-yellow-400 text-sm"></i>
+                                        @endfor
+                                    </div>
+                                </div>
+                                <span class="text-xs text-[var(--text-soft)]">
+                                    Verified Purchase
+                                </span>
+                            </div>
+                            <p class="text-[var(--text-dark)] leading-relaxed">
+                                {{ $review->comment }}
+                            </p>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="text-center py-12 bg-white rounded-2xl border border-[var(--border-light)]">
+                        <i class="fa-regular fa-star text-5xl text-[var(--border-light)] mb-4"></i>
+                        <h3 class="text-xl font-bold text-[var(--text-dark)] mb-2">No reviews yet</h3>
+                        <p class="text-[var(--text-soft)]">Be the first to review this product!</p>
+                        @if (isset($canReview) && $canReview)
+                            <button onclick="openReviewModal()" class="btn-primary mt-4 px-6 py-2.5">
+                                Write a Review
+                            </button>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 z-50 hidden overflow-y-auto"
+        style="background-color: rgba(0,0,0,0.5);">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full">
+                <div class="border-b border-[var(--border-light)] px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-[var(--text-dark)]">Write a Review</h3>
+                    <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="text-center mb-4">
+                        <h4 class="text-lg font-semibold text-[var(--text-dark)]">{{ $product->name }}</h4>
+                    </div>
+
+                    <!-- Star Rating -->
+                    <div class="flex justify-center gap-2 mb-6">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <i class="fa-regular fa-star text-3xl cursor-pointer hover:scale-110 transition star-rating"
+                                data-rating="{{ $i }}"></i>
+                        @endfor
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-[var(--text-dark)] mb-2">Your Review</label>
+                        <textarea id="reviewComment" rows="4"
+                            class="w-full border border-[var(--border-light)] rounded-lg px-3 py-2 focus:outline-none focus:border-[var(--primary)]"
+                            placeholder="Share your experience with this product..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button onclick="submitReview()" class="btn-primary w-full py-3">
+                        Submit Review
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .star-rating {
+            transition: all 0.2s ease;
+            color: #ffc107;
+            cursor: pointer;
+        }
+
+        .star-rating.active {
+            font-weight: 900;
+        }
+
+        .star-rating:hover {
+            transform: scale(1.1);
+        }
+    </style>
+
+    <script>
+        let selectedRating = 0;
+
+        // Star rating click handler
+        document.querySelectorAll('.star-rating').forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+
+                // Update star display
+                document.querySelectorAll('.star-rating').forEach((s, index) => {
+                    if (index < selectedRating) {
+                        s.classList.remove('fa-regular');
+                        s.classList.add('fa-solid', 'active');
+                    } else {
+                        s.classList.remove('fa-solid', 'active');
+                        s.classList.add('fa-regular');
+                    }
+                });
+            });
+        });
+
+        function openReviewModal() {
+            document.getElementById('reviewModal').classList.remove('hidden');
+            // Reset form
+            selectedRating = 0;
+            document.getElementById('reviewComment').value = '';
+            document.querySelectorAll('.star-rating').forEach(star => {
+                star.classList.remove('active', 'fa-solid');
+                star.classList.add('fa-regular');
+            });
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.add('hidden');
+        }
+
+        async function submitReview() {
+            if (selectedRating === 0) {
+                alert('Please select a rating');
+                return;
+            }
+
+            const comment = document.getElementById('reviewComment').value;
+            if (!comment.trim()) {
+                alert('Please write a review comment');
+                return;
+            }
+
+            const submitBtn = event.target;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('{{ route('review.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        product_id: {{ $product->id }},
+                        rating: selectedRating,
+                        comment: comment
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Thank you for your review!');
+                    location.reload(); // Reload to show the new review
+                } else {
+                    alert(data.message || 'Failed to submit review');
+                }
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                alert('Failed to submit review. Please try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('reviewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReviewModal();
+            }
+        });
+    </script>
+
 </x-frontend-layout>
 
 <!-- JavaScript for Image Gallery and Add to Cart -->

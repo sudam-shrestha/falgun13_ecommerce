@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -132,5 +133,47 @@ class OrderController extends Controller
                 'message' => 'Failed to load order details: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+
+    public function dokan_order($record)
+    {
+        $order = Order::with(['items.product.dokan', 'user'])->find($record);
+
+        // Check if the logged-in dokan owns this order's products
+        $dokanId = Auth::guard('dokan')->id();
+        $items = $order->items->filter(function ($item) use ($dokanId) {
+            return $item->product && $item->product->dokan_id == $dokanId;
+        });
+
+        if ($items->isEmpty()) {
+            abort(403, 'Unauthorized access to this order');
+        }
+
+        $subtotal = $items->sum('amount');
+
+        return view("frontend.dokan_order", compact('order', 'items', 'subtotal'));
+    }
+
+    public function downloadDokanReceipt($id)
+    {
+        $order = Order::with(['items.product.dokan', 'user'])->find($id);
+
+        // Check if the logged-in dokan owns this order's products
+        $dokanId = Auth::guard('dokan')->id();
+        $items = $order->items->filter(function ($item) use ($dokanId) {
+            return $item->product && $item->product->dokan_id == $dokanId;
+        });
+
+        if ($items->isEmpty()) {
+            abort(403, 'Unauthorized access to this order');
+        }
+
+        $subtotal = $items->sum('amount');
+        $dokan = $items->first()->product->dokan;
+
+        $pdf = Pdf::loadView('pdf.dokan_receipt', compact('order', 'items', 'subtotal', 'dokan'));
+
+        return $pdf->download('order-receipt-' . $order->id . '.pdf');
     }
 }

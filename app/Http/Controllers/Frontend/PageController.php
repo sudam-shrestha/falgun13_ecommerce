@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Mail\DokanRequestNotification;
 use App\Models\Admin;
 use App\Models\Dokan;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 class PageController extends Controller
@@ -42,11 +44,31 @@ class PageController extends Controller
 
     public function product($slug)
     {
-        $product = Product::where('slug', $slug)->first();
-        if (!$product) {
-            abort(404);
+        $product = Product::where('slug', $slug)
+            ->with(['dokan', 'reviews.user'])
+            ->firstOrFail();
+
+        $averageRating = $product->reviews()->avg('rating');
+        $reviewsCount = $product->reviews()->count();
+
+        // Check if current user can review
+        $canReview = false;
+        $hasReviewed = false;
+
+        if (Auth::check()) {
+            $hasReviewed = $product->reviews()->where('user_id', Auth::id())->exists();
+
+            if (!$hasReviewed) {
+                $canReview = Order::where('user_id', Auth::id())
+                    ->where('status', 'delivered')
+                    ->whereHas('items', function ($query) use ($product) {
+                        $query->where('product_id', $product->id);
+                    })
+                    ->exists();
+            }
         }
-        return view('frontend.product', compact('product'));
+
+        return view('frontend.product', compact('product', 'averageRating', 'reviewsCount', 'canReview', 'hasReviewed'));
     }
 
     public function products()
